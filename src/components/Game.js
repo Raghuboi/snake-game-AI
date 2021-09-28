@@ -63,7 +63,7 @@ export default function Game() {
   
     const checkAppleCollision = newSnake => {
       if (newSnake[0][0] === apple[0] && newSnake[0][1] === apple[1]) {
-        let newApple = createApple();
+        var newApple = createApple();
         while (checkCollision(newApple, newSnake)) {
           newApple = createApple();
         }
@@ -126,13 +126,13 @@ export default function Game() {
       var snakeHead = snake[0]
 
       if (aStarToggle) {
-        let newPath = aStar(snake, apple[0], apple[1], SCALE, CANVAS_SIZE), length = newPath.length
+        const newPath = aStar(snake, apple[0], apple[1], SCALE, CANVAS_SIZE), length = newPath.length
         //newPath && setPath(newPath)
 
         if(newPath && length>=2) {
-          var last = [ newPath[length-1].i, newPath[length-1].j ]
-          var secondLast = [ newPath[length-2].i, newPath[length-2].j ]
-          var newDir = [ secondLast[0]-last[0], secondLast[1]-last[1] ]
+          const last = [ newPath[length-1].i, newPath[length-1].j ]
+          const secondLast = [ newPath[length-2].i, newPath[length-2].j ]
+          const newDir = [ secondLast[0]-last[0], secondLast[1]-last[1] ]
 
           if (
             Math.abs(dir[0]) === Math.abs(newDir[0])

@@ -4,8 +4,8 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
     closed.splice(0)
     open.splice(0)
 
-    let snakeHeadX = snake[0][0]
-    let snakeHeadY = snake[0][1]
+    const snakeHeadX = snake[0][0]
+    const snakeHeadY = snake[0][1]
 
     open[0] = {
         i: snakeHeadX,
@@ -17,31 +17,31 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
     }
 
     while (open.length > 0) {
-        let current = open[0]
+        const current = open[0]
         open.splice(0,1)
         closed.push(current)
-        let i = current.i, j = current.j
+        const i = current.i, j = current.j
 
         if (i === appleX && j === appleY) {
             break
         }
 
-        let left = { 
+        const left = { 
             i: i-1, 
             j: j,
         } 
     
-        let right = {
+        const right = {
             i: i+1,
             j: j,
         } 
     
-        let up = {
+        const up = {
             i: i,
             j: j-1,
         } 
     
-        let down = {
+        const down = {
             i: i,
             j: j+1,
         }
@@ -49,7 +49,7 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
         neighbours = [left,right,up,down]
 
         neighbours.forEach((neighbour) => {
-            let { i, j } = neighbour
+            const { i, j } = neighbour
             if (checkCollision(i, j, snake, SCALE, CANVAS_SIZE) || closed.includes(neighbour)) {
                 return
             }
@@ -59,7 +59,7 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
 
             for(let r = open.length -1 ; r >0 ; r--){
                 if(open[r].f < open[r-1].f){
-                    let temp = open[r-1];
+                    const temp = open[r-1];
                     open[r-1] = open[r];
                     open[r] = temp;
                 }
@@ -92,7 +92,7 @@ const checkCollision = (i, j, snake, SCALE, CANVAS_SIZE) => {
   }
 
 const getValues = (i, j, neighbour, current, appleX, appleY) => {
-    let g = current.g + 1, h = getHValue(i, j, appleX, appleY), f = g + h
+    const g = current.g + 1, h = getHValue(i, j, appleX, appleY), f = g + h
 
     if (!open.includes(neighbour)) {
         neighbour.g = g
@@ -119,8 +119,8 @@ const getValues = (i, j, neighbour, current, appleX, appleY) => {
 }
 
 const getHValue = (nodeX, nodeY, appleX, appleY) => {
-    let diffX = appleX - nodeX;
-    let diffY = appleY - nodeY;
+    const diffX = appleX - nodeX;
+    const diffY = appleY - nodeY;
     
     return Math.floor(Math.sqrt(Math.pow(diffX,2) + Math.pow(diffY,2)) * 10);
 }
