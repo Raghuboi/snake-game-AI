@@ -37,10 +37,10 @@ export default function Game() {
     };
   
     const moveSnake = ({ keyCode }) => {
-       /* if (
+        if (
             Math.abs(dir[0]) === Math.abs(DIRECTIONS[keyCode][0])
             || Math.abs(dir[1]) === Math.abs(DIRECTIONS[keyCode][1])
-        ) return */
+        ) return 
         keyCode >= 37 && keyCode <= 40 && setDir(DIRECTIONS[keyCode])
     }
   
@@ -82,20 +82,6 @@ export default function Game() {
       if (checkCollision(newSnakeHead)) endGame();
       if (!checkAppleCollision(snakeCopy)) snakeCopy.pop();
       setSnake(snakeCopy);
-
-      /*if (aStarToggle) {
-        let newPath = aStar(snakeCopy, apple[0], apple[1], SCALE, CANVAS_SIZE)
-        newPath && setPath(newPath)
-
-        if(newPath && newPath.length>=2) {
-          var last = [ newPath[newPath.length-1].i, newPath[newPath.length-1].j ]
-          var secondLast = [ newPath[newPath.length-2].i, newPath[newPath.length-2].j ]
-          var newDir = [ secondLast[0]-last[0], secondLast[1]-last[1] ]
-          if (last[0]===newSnakeHead[0] && last[1]===newSnakeHead[1]) {
-            dir!==newDir && setDir(newDir)
-          }
-        }
-      }*/
     }
   
     const startGame = () => {
@@ -160,18 +146,27 @@ export default function Game() {
         }
       }
     }, [snake, apple, gameOver])
+
+    useEffect(()=>{
+      if (aStarToggle) startGame()
+    },[aStarToggle])
   
     return (
-      <>
+      <div className="game-components">
+      <div className="game">
+        <h1>Snake AI</h1>
         <canvas
-          style={{ border: "1px solid black" }}
+          style={{ border: "3px solid white" }}
           ref={canvasRef}
           width={`${CANVAS_SIZE[0]}px`}
           height={`${CANVAS_SIZE[1]}px`}
         />
+      </div>
+      <div className="buttons">
         {gameOver && <div>GAME OVER!</div>}
         <button onClick={startGame}>Start Game</button>
         <button onClick={()=> {setAStarToggle(!aStarToggle)}}>A* Algorithm</button>
-        </>
+      </div>
+    </div>
     )
 }
