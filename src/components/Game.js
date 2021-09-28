@@ -21,6 +21,7 @@ export default function Game() {
     const [path, setPath] = useState(null)
 
     const [aStarToggle, setAStarToggle] = useState(false)
+    const [survivalMode, setSurvivalMode] = useState(false)
   
     useInterval(() => gameLoop(), speed);
 
@@ -109,7 +110,8 @@ export default function Game() {
         const context = canvasRef.current.getContext("2d");
         context.clearRect(0, 0, window.innerWidth, window.innerHeight);
         if (aStarToggle) {
-          context.fillStyle = "red"
+          context.fillStyle = (survivalMode) ? "green" : "red"
+
         }
         else context.fillStyle = "pink";
         snake.forEach(([x, y]) => context.fillRect(x, y, 1, 1));
@@ -129,13 +131,15 @@ export default function Game() {
       if (aStarToggle) {
         var newPath = null;
       
-        if (!path || path.length<2) {
-          newPath = aStar(snake, apple[0], apple[1], SCALE, CANVAS_SIZE)
-        }
+        //if (!path || path.length<2) {
+          const result = aStar(snake, apple[0], apple[1], SCALE, CANVAS_SIZE)
+          newPath = result.path
+          setSurvivalMode(result.survivalMode)
+        //}
 
-        else if (path) {
+        /*else if (path) {
           newPath = path.slice(0, path.length-1)
-        } 
+        }*/ 
 
         newPath && setPath(newPath)
         const length = newPath.length

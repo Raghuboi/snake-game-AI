@@ -1,9 +1,10 @@
-let open = [], closed = [], path = [], neighbours = []
+let open = [], closed = [], path = [], neighbours = [], survivalMode= false
 
 export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {   
-    console.log("AStar start")
+    survivalMode= false
     open.splice(0)
     closed.splice(0)
+    let counter = 0
 
     const snakeHeadX = snake[0][0]
     const snakeHeadY = snake[0][1]
@@ -17,8 +18,13 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
         //cameFrom: { i: snake[1][0], j: snake[1][1] }
     }
 
-    while (open.length) {
-        console.log("AStar while loop entered")
+    while (open.length>0) {
+        counter++
+        if (counter>5000) {
+            console.log("error")
+            survivalMode = true
+            break
+        } 
 
         const current = open[0]
         open.splice(0,1)
@@ -26,7 +32,6 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
         const i = current.i, j = current.j
 
         if (i === appleX && j === appleY) {
-            console.log("AStar found Apple")
             break
         }
 
@@ -76,9 +81,7 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
 
     path.splice(0)
     findPath()
-    console.log("AStar finished")
-    console.log("------------------")
-    return path
+    return { path, survivalMode }
 }
 
 const checkCollision = (i, j, snake, SCALE, CANVAS_SIZE) => {
