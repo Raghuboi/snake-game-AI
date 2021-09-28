@@ -20,7 +20,7 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
 
     while (open.length>0) {
         counter++
-        if (counter>5000) {
+        if (counter>3000) {
             console.log("error")
             survivalMode = true
             break

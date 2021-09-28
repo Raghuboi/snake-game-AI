@@ -1,0 +1,48 @@
+* {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    width: vw;
+    height: vh;
+    background-color:black;
+    color: white;
+}
+
+.game-components {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap: 2.5rem;
+}
+
+.game {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.buttons {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 1rem;
+}
+
+.buttons button {
+    height: 2rem;
+    width: 10rem;
+    font-weight: 700;
+    border-style: none;
+}
+
+.buttons button:hover {
+    transform: scale(1.2);
+}
