@@ -1,28 +1,32 @@
 let open = [], closed = [], path = [], neighbours = []
 
-export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
+export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {   
+    console.log("AStar start")
+
     closed.splice(0)
-    open.splice(0)
 
     const snakeHeadX = snake[0][0]
     const snakeHeadY = snake[0][1]
 
-    open[0] = {
+    open = [{
         i: snakeHeadX,
         j: snakeHeadY,
         g: 0,
         f: getHValue({ i: snakeHeadX, j: snakeHeadY }, appleX, appleY),
         cameFrom: null
         //cameFrom: { i: snake[1][0], j: snake[1][1] }
-    }
+    }]
 
-    while (open.length > 0) {
+    while (open.length) {
+        console.log("AStar while loop entered")
+
         const current = open[0]
         open.splice(0,1)
         closed.push(current)
         const i = current.i, j = current.j
 
         if (i === appleX && j === appleY) {
+            console.log("AStar found Apple")
             break
         }
 
@@ -49,6 +53,7 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
         neighbours = [left,right,up,down]
 
         neighbours.forEach((neighbour) => {
+
             const { i, j } = neighbour
             if (checkCollision(i, j, snake, SCALE, CANVAS_SIZE) || closed.includes(neighbour)) {
                 return
@@ -66,10 +71,13 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
             }
         }
         })
+        
     }
 
     path.splice(0)
     findPath()
+    console.log("AStar finished")
+    console.log("------------------")
     return path
 }
 

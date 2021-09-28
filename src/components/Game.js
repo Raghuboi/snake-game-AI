@@ -18,7 +18,7 @@ export default function Game() {
     const [dir, setDir] = useState([0, -1])
     const [speed, setSpeed] = useState(null)
     const [gameOver, setGameOver] = useState(false)
-    //const [path, setPath] = useState([])
+    const [path, setPath] = useState(null)
 
     const [aStarToggle, setAStarToggle] = useState(false)
   
@@ -27,6 +27,7 @@ export default function Game() {
     useEffect(() => {
         const context = canvasRef.current.getContext("2d");
         context.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+        document.addEventListener('keydown', moveSnake)
     }, [])
   
     const endGame = () => {
@@ -123,11 +124,21 @@ export default function Game() {
     }, [snake, apple, gameOver])
 
     useEffect(() => {
-      var snakeHead = snake[0]
+      const snakeHead = snake[0]
 
       if (aStarToggle) {
-        const newPath = aStar(snake, apple[0], apple[1], SCALE, CANVAS_SIZE), length = newPath.length
-        //newPath && setPath(newPath)
+        var newPath = null;
+      
+        if (!path || path.length<2) {
+          newPath = aStar(snake, apple[0], apple[1], SCALE, CANVAS_SIZE)
+        }
+
+        else if (path) {
+          newPath = path.slice(0, path.length-1)
+        } 
+
+        newPath && setPath(newPath)
+        const length = newPath.length
 
         if(newPath && length>=2) {
           const last = [ newPath[length-1].i, newPath[length-1].j ]
@@ -144,10 +155,10 @@ export default function Game() {
           }
         }
       }
-    }, [snake, apple])
+    }, [snake, apple, gameOver])
   
     return (
-      <div role="button" tabIndex="0" onKeyDown={e => moveSnake(e)}>
+      <>
         <canvas
           style={{ border: "1px solid black" }}
           ref={canvasRef}
@@ -157,6 +168,6 @@ export default function Game() {
         {gameOver && <div>GAME OVER!</div>}
         <button onClick={startGame}>Start Game</button>
         <button onClick={()=> {setAStarToggle(!aStarToggle)}}>A* Algorithm</button>
-      </div>
+        </>
     )
 }
