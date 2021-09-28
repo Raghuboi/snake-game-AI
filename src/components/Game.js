@@ -110,14 +110,11 @@ export default function Game() {
         }
 
         setNeighbours([left,right,up,down])
-
-      aStar(snake, apple, neighbours)
-
     }
 
     useEffect(() => {
-        //aStar(snake, neighbours.filter(x => x.collission===false), apple, SCALE)
-    }, [snake])
+      aStar(snake, apple, neighbours)
+    }, [snake, apple, neighbours])
   
     const startGame = () => {
         setSnake(SNAKE_START);

@@ -1,6 +1,8 @@
 let open = [], closed = [], path = []
 
 const aStar = (snake, apple, neighbours) => {
+    open.splice(0)
+    closed.splice(0)
 
     open[0] = {
         i: snake[0][0],
@@ -15,16 +17,25 @@ const aStar = (snake, apple, neighbours) => {
         open.splice(0,1)
         closed.push(current)
         let i = current.i, j = current.j
-        //console.log({i: i, j: j, appleX: apple[0], appleY: apple[1]})
 
-        if (i === apple[0] && j === apple[1]) break
+        if (i === apple[0] && j === apple[1]) {
+            break
+        }
 
         neighbours.forEach(neighbour => {
-            if (neighbour.collision || closed.includes(neighbour)) return
+            if (neighbour.collision || closed.includes(neighbour)) {
+                return
+            }
 
-            let newNeighbour = getValues(neighbour, current, apple)
+            getValues(neighbour, current, apple)
 
-            console.log(newNeighbour)
+            for(let r = open.length -1 ; r >0 ; r--){
+                if(open[r].f < open[r-1].f){
+                    let temp = open[r-1];
+                    open[r-1] = open[r];
+                    open[r] = temp;
+                }
+            }
         })
     }
 
@@ -35,22 +46,20 @@ const aStar = (snake, apple, neighbours) => {
 const getValues = (neighbour, current, apple) => {
     let g = current.g + 1, h = getHValue(neighbour, apple), f = g + h
 
-    if (f < neighbour.f || !open.includes(neighbour)) {
-
-        let newNeighbour = {
-            i: neighbour.i,
-            j: neighbour.j,
-            g: g,
-            h: h,
-            f: f,
-            cameFrom: current
-        }
-
-        if (!open.includes(neighbour)) open.push(newNeighbour)
-        return newNeighbour
+    if (!open.includes(neighbour)) {
+        neighbour.g = g
+        neighbour.h = h
+        neighbour.f = f
+        neighbour.cameFrom = current
+        open.push(neighbour)
     }
 
-    else return 
+    if (f < neighbour.f) {
+        neighbour.g = g
+        neighbour.h = h
+        neighbour.f = f
+        neighbour.cameFrom = current
+    } 
 }
 
 const getHValue = (node, apple) => {
@@ -61,7 +70,18 @@ const getHValue = (node, apple) => {
 }
 
 const findPath = () => {
-
+    let previous = '';
+    for(let i = closed.length - 1; i>=0; i--){
+        
+        if(i === closed.length - 1 && previous === ''){
+            previous = closed[i];
+            path.push(previous);
+        }
+        else if(previous.cameFrom.i === closed[i].i && previous.cameFrom.j === closed[i].j){
+            previous = closed[i];
+            path.push(previous);
+        }            
+    }
 }
 
 module.exports = { aStar }
