@@ -1,14 +1,17 @@
 let open = [], closed = [], path = [], neighbours = []
 
-const aStar = (snake, apple, SCALE, CANVAS_SIZE) => {
+export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
     closed.splice(0)
     open.splice(0)
 
+    let snakeHeadX = snake[0][0]
+    let snakeHeadY = snake[0][1]
+
     open[0] = {
-        i: snake[0][0],
-        j: snake[0][1],
+        i: snakeHeadX,
+        j: snakeHeadY,
         g: 0,
-        f: getHValue({ i: snake[0][0], j: snake[0][1] }, apple),
+        f: getHValue({ i: snakeHeadX, j: snakeHeadY }, appleX, appleY),
         cameFrom: null
         //cameFrom: { i: snake[1][0], j: snake[1][1] }
     }
@@ -19,7 +22,7 @@ const aStar = (snake, apple, SCALE, CANVAS_SIZE) => {
         closed.push(current)
         let i = current.i, j = current.j
 
-        if (i === apple[0] && j === apple[1]) {
+        if (i === appleX && j === appleY) {
             break
         }
 
@@ -46,12 +49,13 @@ const aStar = (snake, apple, SCALE, CANVAS_SIZE) => {
         neighbours = [left,right,up,down]
 
         neighbours.forEach((neighbour) => {
-            if (checkCollision(neighbour.i, neighbour.j, snake, SCALE, CANVAS_SIZE) || closed.includes(neighbour)) {
+            let { i, j } = neighbour
+            if (checkCollision(i, j, snake, SCALE, CANVAS_SIZE) || closed.includes(neighbour)) {
                 return
             }
 
             else {
-            getValues(neighbour, current, apple)
+            getValues(i, j, neighbour, current, appleX, appleY)
 
             for(let r = open.length -1 ; r >0 ; r--){
                 if(open[r].f < open[r-1].f){
@@ -87,8 +91,8 @@ const checkCollision = (i, j, snake, SCALE, CANVAS_SIZE) => {
     return false;
   }
 
-const getValues = (neighbour, current, apple) => {
-    let g = current.g + 1, h = getHValue(neighbour, apple), f = g + h
+const getValues = (i, j, neighbour, current, appleX, appleY) => {
+    let g = current.g + 1, h = getHValue(i, j, appleX, appleY), f = g + h
 
     if (!open.includes(neighbour)) {
         neighbour.g = g
@@ -98,17 +102,25 @@ const getValues = (neighbour, current, apple) => {
         open.push(neighbour)
     }
 
-    if (f < neighbour.f) {
+    else if (f < neighbour.f) {
         neighbour.g = g
         neighbour.h = h
         neighbour.f = f
         neighbour.cameFrom = current
     } 
+
+    /*if (!open.includes(neighbour) || f < neighbour.f ) {
+        neighbour.g = g
+        neighbour.h = h
+        neighbour.f = f
+        neighbour.cameFrom = current
+        if (!open.includes(neighbour)) open.push(neighbour)
+    }*/
 }
 
-const getHValue = (node, apple) => {
-    let diffX = apple[0] - node.i;
-    let diffY = apple[1] - node.j;
+const getHValue = (nodeX, nodeY, appleX, appleY) => {
+    let diffX = appleX - nodeX;
+    let diffY = appleY - nodeY;
     
     return Math.floor(Math.sqrt(Math.pow(diffX,2) + Math.pow(diffY,2)) * 10);
 }
@@ -127,5 +139,3 @@ const findPath = () => {
         }            
     }
 }
-
-module.exports = { aStar }

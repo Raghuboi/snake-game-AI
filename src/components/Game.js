@@ -18,7 +18,7 @@ export default function Game() {
     const [dir, setDir] = useState([0, -1])
     const [speed, setSpeed] = useState(null)
     const [gameOver, setGameOver] = useState(false)
-    const [path, setPath] = useState([])
+    //const [path, setPath] = useState([])
 
     const [aStarToggle, setAStarToggle] = useState(false)
   
@@ -71,7 +71,7 @@ export default function Game() {
         return true;
       }
       return false;
-    };
+    }
 
     const gameLoop = () => {
       const snakeCopy = JSON.parse(JSON.stringify(snake));
@@ -81,8 +81,8 @@ export default function Game() {
       if (!checkAppleCollision(snakeCopy)) snakeCopy.pop();
       setSnake(snakeCopy);
 
-      if (aStarToggle) {
-        let newPath = aStar(snakeCopy, apple, SCALE, CANVAS_SIZE)
+      /*if (aStarToggle) {
+        let newPath = aStar(snakeCopy, apple[0], apple[1], SCALE, CANVAS_SIZE)
         newPath && setPath(newPath)
 
         if(newPath && newPath.length>=2) {
@@ -93,7 +93,7 @@ export default function Game() {
             dir!==newDir && setDir(newDir)
           }
         }
-      }
+      }*/
     }
   
     const startGame = () => {
@@ -115,16 +115,35 @@ export default function Game() {
         context.fillStyle = "lightblue";
         context.fillRect(apple[0], apple[1], 1, 1);
         
-        /*
-        path.forEach(({i, j}) => {
+        
+        /*path.forEach(({i, j}) => {
           context.fillStyle = "green"
           context.fillRect(i, j, 1, 1)
-        })
-        */
-
+        })*/
     }, [snake, apple, gameOver])
 
     useEffect(() => {
+      var snakeHead = snake[0]
+
+      if (aStarToggle) {
+        let newPath = aStar(snake, apple[0], apple[1], SCALE, CANVAS_SIZE), length = newPath.length
+        //newPath && setPath(newPath)
+
+        if(newPath && length>=2) {
+          var last = [ newPath[length-1].i, newPath[length-1].j ]
+          var secondLast = [ newPath[length-2].i, newPath[length-2].j ]
+          var newDir = [ secondLast[0]-last[0], secondLast[1]-last[1] ]
+
+          if (
+            Math.abs(dir[0]) === Math.abs(newDir[0])
+            || Math.abs(dir[1]) === Math.abs(newDir[1])
+        ) return 
+
+          else if (last[0]===snakeHead[0] && last[1]===snakeHead[1]) {
+            dir!==newDir && setDir(newDir)
+          }
+        }
+      }
     }, [snake, apple])
   
     return (
