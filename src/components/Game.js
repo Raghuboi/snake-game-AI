@@ -18,8 +18,9 @@ export default function Game() {
     const [dir, setDir] = useState([0, -1])
     const [speed, setSpeed] = useState(null)
     const [gameOver, setGameOver] = useState(false)
+    const [path, setPath] = useState([])
 
-    const [neighbours, setNeighbours] = useState([])
+    const [aStarToggle, setAStarToggle] = useState(false)
   
     useInterval(() => gameLoop(), speed);
 
@@ -34,10 +35,10 @@ export default function Game() {
     };
   
     const moveSnake = ({ keyCode }) => {
-        /*if (
+       /* if (
             Math.abs(dir[0]) === Math.abs(DIRECTIONS[keyCode][0])
             || Math.abs(dir[1]) === Math.abs(DIRECTIONS[keyCode][1])
-        ) return*/
+        ) return */
 
         keyCode >= 37 && keyCode <= 40 && setDir(DIRECTIONS[keyCode])
     }
@@ -81,40 +82,11 @@ export default function Game() {
         if (!checkAppleCollision(snakeCopy)) snakeCopy.pop();
         setSnake(snakeCopy);
 
-        let left = {
-            collission: checkCollision([ newSnakeHead[0]-1, newSnakeHead[1] ]), 
-            i: newSnakeHead[0]-1, 
-            j: newSnakeHead[1],
-            cameFrom: {i: newSnakeHead[0], j: newSnakeHead[1]}
-        } 
-
-        let right = {
-            collission: checkCollision([ newSnakeHead[0]+1, newSnakeHead[1] ]),
-            i: newSnakeHead[0]+1,
-            j: newSnakeHead[1],
-            cameFrom: {i: newSnakeHead[0], j: newSnakeHead[1]}
-        } 
-
-        let up = {
-            collission: checkCollision([ newSnakeHead[0], newSnakeHead[1]-1 ]),
-            i: newSnakeHead[0],
-            j: newSnakeHead[1]-1,
-            cameFrom: {i: newSnakeHead[0], j: newSnakeHead[1]}
-        } 
-
-        let down = {
-            collission: checkCollision([ newSnakeHead[0], newSnakeHead[1]+1 ]),
-            i: newSnakeHead[0],
-            j: newSnakeHead[1]+1,
-            cameFrom: {i: newSnakeHead[0], j: newSnakeHead[1]}
+        if (aStarToggle) {
+          let newPath = aStar(snakeCopy, apple, SCALE, CANVAS_SIZE)
+          setPath(newPath)
         }
-
-        setNeighbours([left,right,up,down])
     }
-
-    useEffect(() => {
-      aStar(snake, apple, neighbours)
-    }, [snake, apple, neighbours])
   
     const startGame = () => {
         setSnake(SNAKE_START);
@@ -131,10 +103,11 @@ export default function Game() {
         snake.forEach(([x, y]) => context.fillRect(x, y, 1, 1));
         context.fillStyle = "lightblue";
         context.fillRect(apple[0], apple[1], 1, 1);
-
-        
-
-    }, [snake, apple, gameOver]);
+        path.forEach(({i, j}) => {
+          context.fillStyle = "green"
+          context.fillRect(i, j, 1, 1)
+        })
+    }, [snake, apple, gameOver])
   
     return (
       <div role="button" tabIndex="0" onKeyDown={e => moveSnake(e)}>
@@ -146,6 +119,7 @@ export default function Game() {
         />
         {gameOver && <div>GAME OVER!</div>}
         <button onClick={startGame}>Start Game</button>
+        <button onClick={()=> {setAStarToggle(!aStarToggle)}}>A* Algorithm</button>
       </div>
     )
 }
