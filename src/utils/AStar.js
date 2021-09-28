@@ -45,7 +45,7 @@ const aStar = (snake, apple, SCALE, CANVAS_SIZE) => {
     
         neighbours = [left,right,up,down]
 
-        neighbours.forEach(neighbour => {
+        neighbours.forEach((neighbour) => {
             if (checkCollision(neighbour.i, neighbour.j, snake, SCALE, CANVAS_SIZE) || closed.includes(neighbour)) {
                 return
             }
@@ -66,7 +66,6 @@ const aStar = (snake, apple, SCALE, CANVAS_SIZE) => {
 
     path.splice(0)
     findPath()
-    console.log(path)
     return path
 }
 
@@ -81,7 +80,9 @@ const checkCollision = (i, j, snake, SCALE, CANVAS_SIZE) => {
       return true;
 
     for (const segment of snake) {
-      if (i === segment[0] && j === segment[1]) return true;
+      if (i === segment[0] && j === segment[1]) {
+          return true
+      }
     }
     return false;
   }
@@ -118,7 +119,7 @@ const findPath = () => {
         
         if(i === closed.length - 1 && previous === ''){
             previous = closed[i];
-            //path.push(previous);
+            path.push(previous);
         }
         else if(previous.cameFrom.i === closed[i].i && previous.cameFrom.j === closed[i].j){
             previous = closed[i];

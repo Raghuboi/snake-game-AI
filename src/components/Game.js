@@ -39,7 +39,6 @@ export default function Game() {
             Math.abs(dir[0]) === Math.abs(DIRECTIONS[keyCode][0])
             || Math.abs(dir[1]) === Math.abs(DIRECTIONS[keyCode][1])
         ) return */
-
         keyCode >= 37 && keyCode <= 40 && setDir(DIRECTIONS[keyCode])
     }
   
@@ -75,17 +74,26 @@ export default function Game() {
     };
 
     const gameLoop = () => {
-        const snakeCopy = JSON.parse(JSON.stringify(snake));
-        const newSnakeHead = [snakeCopy[0][0] + dir[0], snakeCopy[0][1] + dir[1]];
-        snakeCopy.unshift(newSnakeHead);
-        if (checkCollision(newSnakeHead)) endGame();
-        if (!checkAppleCollision(snakeCopy)) snakeCopy.pop();
-        setSnake(snakeCopy);
+      const snakeCopy = JSON.parse(JSON.stringify(snake));
+      const newSnakeHead = [snakeCopy[0][0] + dir[0], snakeCopy[0][1] + dir[1]];
+      snakeCopy.unshift(newSnakeHead);
+      if (checkCollision(newSnakeHead)) endGame();
+      if (!checkAppleCollision(snakeCopy)) snakeCopy.pop();
+      setSnake(snakeCopy);
 
-        if (aStarToggle) {
-          let newPath = aStar(snakeCopy, apple, SCALE, CANVAS_SIZE)
-          setPath(newPath)
+      if (aStarToggle) {
+        let newPath = aStar(snakeCopy, apple, SCALE, CANVAS_SIZE)
+        newPath && setPath(newPath)
+
+        if(newPath && newPath.length>=2) {
+          var last = [ newPath[newPath.length-1].i, newPath[newPath.length-1].j ]
+          var secondLast = [ newPath[newPath.length-2].i, newPath[newPath.length-2].j ]
+          var newDir = [ secondLast[0]-last[0], secondLast[1]-last[1] ]
+          if (last[0]===newSnakeHead[0] && last[1]===newSnakeHead[1]) {
+            dir!==newDir && setDir(newDir)
+          }
         }
+      }
     }
   
     const startGame = () => {
@@ -99,15 +107,25 @@ export default function Game() {
     useEffect(() => {
         const context = canvasRef.current.getContext("2d");
         context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        context.fillStyle = "pink";
+        if (aStarToggle) {
+          context.fillStyle = "red"
+        }
+        else context.fillStyle = "pink";
         snake.forEach(([x, y]) => context.fillRect(x, y, 1, 1));
         context.fillStyle = "lightblue";
         context.fillRect(apple[0], apple[1], 1, 1);
+        
+        /*
         path.forEach(({i, j}) => {
           context.fillStyle = "green"
           context.fillRect(i, j, 1, 1)
         })
+        */
+
     }, [snake, apple, gameOver])
+
+    useEffect(() => {
+    }, [snake, apple])
   
     return (
       <div role="button" tabIndex="0" onKeyDown={e => moveSnake(e)}>
