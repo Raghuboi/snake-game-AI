@@ -2,20 +2,20 @@ let open = [], closed = [], path = [], neighbours = []
 
 export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {   
     console.log("AStar start")
-
+    open.splice(0)
     closed.splice(0)
 
     const snakeHeadX = snake[0][0]
     const snakeHeadY = snake[0][1]
 
-    open = [{
+    open[0] = {
         i: snakeHeadX,
         j: snakeHeadY,
         g: 0,
         f: getHValue({ i: snakeHeadX, j: snakeHeadY }, appleX, appleY),
         cameFrom: null
         //cameFrom: { i: snake[1][0], j: snake[1][1] }
-    }]
+    }
 
     while (open.length) {
         console.log("AStar while loop entered")
