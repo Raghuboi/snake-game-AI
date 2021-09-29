@@ -29,11 +29,31 @@ body {
 }
 
 .buttons {
+    width: max-content;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     gap: 1rem;
+}
+
+.checkboxes {
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.checkbox-item {
+    display: flex;
+    flex-direction: row-reverse;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.checkbox-item h4 {
+    margin: 0;
 }
 
 .buttons button {
