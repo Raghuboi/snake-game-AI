@@ -18,7 +18,11 @@ export default function Game() {
     const [dir, setDir] = useState([0, -1])
     const [speed, setSpeed] = useState(null)
     const [gameOver, setGameOver] = useState(false)
+
     const [path, setPath] = useState(null)
+    const [pathToggle, setPathToggle] = useState(false)
+    const [closedToggle, setClosedToggle] = useState(false)
+    const [closed, setClosed] = useState(null)
 
     const [aStarToggle, setAStarToggle] = useState(false)
     const [survivalMode, setSurvivalMode] = useState(false)
@@ -37,10 +41,10 @@ export default function Game() {
     };
   
     const moveSnake = ({ keyCode }) => {
-        if (
+        /*if (
             Math.abs(dir[0]) === Math.abs(DIRECTIONS[keyCode][0])
             || Math.abs(dir[1]) === Math.abs(DIRECTIONS[keyCode][1])
-        ) return 
+        ) return*/ 
         keyCode >= 37 && keyCode <= 40 && setDir(DIRECTIONS[keyCode])
     }
   
@@ -90,42 +94,57 @@ export default function Game() {
         setDir([0, -1]);
         setSpeed(SPEED);
         setGameOver(false);
-    };
+    }
+
+    const drawLine = (path) => {
+      const ctx = canvasRef.current.getContext("2d")
+     
+      ctx.strokeStyle = "blue";
+      for(let i=1; i<path.length -3; i++){
+          ctx.beginPath();
+          ctx.moveTo(path[i].i+0.5, path[i].j+0.5);
+          ctx.lineTo(path[i+1].i+0.5, path[i+1].j+0.5);
+          ctx.lineWidth = 0.05
+          ctx.stroke();
+          ctx.closePath();
+      }
+    }
+
+    const drawClosed = (closed) => {
+      const context = canvasRef.current.getContext("2d")
+      context.globalAlpha = 0.2
+      context.fillStyle = "white"
+      closed && closed.forEach(({i, j}) => context.fillRect(i, j, 1, 1))
+      context.globalAlpha =1
+
+    }
   
     useEffect(() => {
         const context = canvasRef.current.getContext("2d");
         context.clearRect(0, 0, window.innerWidth, window.innerHeight);
         if (aStarToggle) {
-          context.fillStyle = (survivalMode) ? "green" : "red"
-
-        }
-        else context.fillStyle = "pink";
+          context.fillStyle = (survivalMode) ? "green" : "purple"
+        }    
+        else context.fillStyle = "#6CBB3C";
         snake.forEach(([x, y]) => context.fillRect(x, y, 1, 1));
-        context.fillStyle = "lightblue";
+        context.fillStyle = "#EB4C42";
         context.fillRect(apple[0], apple[1], 1, 1);
-        
-        
-        /*path.forEach(({i, j}) => {
-          context.fillStyle = "green"
-          context.fillRect(i, j, 1, 1)
-        })*/
-    }, [snake, apple, gameOver])
+
+        !gameOver && pathToggle && path && drawLine(path)
+        !gameOver && closedToggle && closed && drawClosed(closed)
+
+    }, [snake, apple, gameOver, path])
 
     useEffect(() => {
       const snakeHead = snake[0]
 
       if (aStarToggle) {
         var newPath = null;
-      
-        //if (!path || path.length<2) {
-          const result = aStar(snake, apple[0], apple[1], SCALE, CANVAS_SIZE)
-          newPath = result.path
-          setSurvivalMode(result.survivalMode)
-        //}
-
-        /*else if (path) {
-          newPath = path.slice(0, path.length-1)
-        }*/ 
+    
+        const result = aStar(snake, apple[0], apple[1], SCALE, CANVAS_SIZE)
+        newPath = result.path
+        setSurvivalMode(result.survivalMode)
+        setClosed(result.closed)
 
         newPath && setPath(newPath)
         const length = newPath.length
@@ -145,10 +164,13 @@ export default function Game() {
           }
         }
       }
+
     }, [snake, apple, gameOver])
 
     useEffect(()=>{
-      if (aStarToggle) startGame()
+      if (aStarToggle) {
+        startGame()
+      }
     },[aStarToggle])
   
     return (
@@ -165,7 +187,20 @@ export default function Game() {
       <div className="buttons">
         {gameOver && <div>GAME OVER!</div>}
         <button onClick={startGame}>Start Game</button>
-        <button onClick={()=> {setAStarToggle(!aStarToggle)}}>A* Algorithm</button>
+        <button onClick={()=> {setAStarToggle(!aStarToggle)}}>A*</button>
+        {aStarToggle &&
+        <div className="checkboxes">
+          <div className="checkbox-item"><h4>Scanned</h4>
+          <input type="checkbox" onChange={e => {
+            if (e.target.checked) setClosedToggle(true)
+            else setClosedToggle(false)
+          }}/></div>
+        <div className="checkbox-item"><h4>Path</h4> 
+          <input type="checkbox" onChange={e => {
+            if (e.target.checked) setPathToggle(true)
+            else setPathToggle(false)
+          }}/></div>
+          </div>}
       </div>
     </div>
     )
