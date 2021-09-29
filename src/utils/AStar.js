@@ -1,4 +1,4 @@
-let open = [], closed = [], path = [], neighbours = [], survivalMode= false
+let open = [], closed = [], path = [], survivalMode= false
 
 export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {   
     survivalMode= false
@@ -35,37 +35,23 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
             break
         }
 
-        const left = { 
-            i: i-1, 
-            j: j,
-        } 
-    
-        const right = {
-            i: i+1,
-            j: j,
-        } 
-    
-        const up = {
-            i: i,
-            j: j-1,
-        } 
-    
-        const down = {
-            i: i,
-            j: j+1,
-        }
-    
-        neighbours = [left,right,up,down]
-
-        neighbours.forEach((neighbour) => {
+        getNeighbours(current, appleX, appleY).forEach((neighbour) => {
 
             const { i, j } = neighbour
-            if (checkCollision(i, j, snake, SCALE, CANVAS_SIZE) || closed.includes(neighbour)) {
-                return
-            }
 
-            else {
-            getValues(i, j, neighbour, current, appleX, appleY)
+            if (checkCollision(i, j, snake, SCALE, CANVAS_SIZE) || closed.some(item => item.i===neighbour.i && item.j===neighbour.j)) 
+                return
+
+            const newMovementCostToNeighbour = current.g + getHValue(current.i, current.j, neighbour.i, neighbour.j)   
+            
+            if (newMovementCostToNeighbour < neighbour.g || !open.some(item => item.i===neighbour.i && item.j===neighbour.j)) {
+                neighbour.g = newMovementCostToNeighbour
+                neighbour.h = getHValue(i, j, appleX, appleY)
+                neighbour.f = neighbour.g + neighbour.h
+                neighbour.cameFrom = current
+
+                if(!open.some(item => item.i===neighbour.i && item.j===neighbour.j)) open.push(neighbour)
+            }
 
             for(let r = open.length -1 ; r >0 ; r--){
                 if(open[r].f < open[r-1].f){
@@ -74,14 +60,13 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
                     open[r] = temp;
                 }
             }
-        }
         })
         
     }
 
     path.splice(0)
     findPath()
-    return { path, survivalMode }
+    return { path, survivalMode, closed }
 }
 
 const checkCollision = (i, j, snake, SCALE, CANVAS_SIZE) => {
@@ -102,38 +87,13 @@ const checkCollision = (i, j, snake, SCALE, CANVAS_SIZE) => {
     return false;
   }
 
-const getValues = (i, j, neighbour, current, appleX, appleY) => {
-    const g = current.g + 1, h = getHValue(i, j, appleX, appleY), f = g + h
-
-    if (!open.includes(neighbour)) {
-        neighbour.g = g
-        neighbour.h = h
-        neighbour.f = f
-        neighbour.cameFrom = current
-        open.push(neighbour)
-    }
-
-    else if (f < neighbour.f) {
-        neighbour.g = g
-        neighbour.h = h
-        neighbour.f = f
-        neighbour.cameFrom = current
-    } 
-
-    /*if (!open.includes(neighbour) || f < neighbour.f ) {
-        neighbour.g = g
-        neighbour.h = h
-        neighbour.f = f
-        neighbour.cameFrom = current
-        if (!open.includes(neighbour)) open.push(neighbour)
-    }*/
-}
-
 const getHValue = (nodeX, nodeY, appleX, appleY) => {
     const diffX = appleX - nodeX;
     const diffY = appleY - nodeY;
     
-    return Math.floor(Math.sqrt(Math.pow(diffX,2) + Math.pow(diffY,2)) * 10);
+    //return Math.floor(Math.sqrt(Math.pow(diffX,2) + Math.pow(diffY,2)) * 10);
+    if (diffX > diffY) return 14 * diffY + 10 * (diffX-diffY)
+    return 14 * diffX + 10 * (diffY - diffX)
 }
 
 const findPath = () => {
@@ -149,4 +109,46 @@ const findPath = () => {
             path.push(previous);
         }            
     }
+}
+
+const getNeighbours = (current, appleX, appleY) => {
+    const i = current.i, j = current.j, g = current.g+1
+
+    const left = { 
+        i: i-1, 
+        j: j,
+        g: g,
+        h: getHValue(i-1, j, appleX, appleY),
+        cameFrom: current
+    }
+    left.f = left.g + left.h 
+
+    const right = {
+        i: i+1,
+        j: j,
+        g: g,
+        h: getHValue(i+1, j, appleX, appleY),
+        cameFrom: current
+    }
+    right.f = right.g + right.h 
+
+    const up = {
+        i: i,
+        j: j-1,
+        g: g,
+        h: getHValue(i, j-1, appleX, appleY),
+        cameFrom: current
+    }
+    up.f = up.g + up.h 
+
+    const down = {
+        i: i,
+        j: j+1,
+        g: g,
+        h: getHValue(i, j+1, appleX, appleY),
+        cameFrom: current
+    }
+    down.f = down.g + down.h
+
+    return [left,right,up,down]
 }
