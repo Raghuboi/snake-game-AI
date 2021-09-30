@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useInterval } from "../utils/useInterval.js";
+import { useSwipeable } from "react-swipeable";
 import {
   SCALE,
   CANVAS_SIZE,
@@ -36,6 +37,13 @@ export default function Game() {
       context.setTransform(SCALE, 0, 0, SCALE, 0, 0);
       document.addEventListener('keydown', moveSnake)
     }, [])
+
+    const handlers = useSwipeable(({
+        onSwipedLeft: () => moveSnake({keyCode: 37}),
+        onSwipedUp: () => moveSnake({keyCode: 38}),
+        onSwipedRight: () => moveSnake({keyCode: 39}),
+        onSwipedDown: () => moveSnake({keyCode: 40})
+    }))
   
     const endGame = () => {
       setSpeed(null);
@@ -93,6 +101,7 @@ export default function Game() {
       if (!checkAppleCollision(snakeCopy)) snakeCopy.pop();
       setSnake(snakeCopy);
     }
+      
   
     const startGame = () => {
         setSnake(SNAKE_START);
@@ -139,13 +148,13 @@ export default function Game() {
 
         !gameOver && pathToggle && path && drawLine(path)
         !gameOver && closedToggle && closed && drawClosed(closed)
-
-    }, [snake, apple, gameOver, path])
+    }, [snake, apple, gameOver])
 
     useEffect(() => {
       const snakeHead = snake[0]
 
       if (aStarToggle) {
+        setSpeed(100)
         setGreedyToggle(false)
         var newPath = null;
     
@@ -162,12 +171,7 @@ export default function Game() {
           const secondLast = [ newPath[length-2].i, newPath[length-2].j ]
           const newDir = [ secondLast[0]-last[0], secondLast[1]-last[1] ]
 
-          if (
-            Math.abs(dir[0]) === Math.abs(newDir[0])
-            || Math.abs(dir[1]) === Math.abs(newDir[1])
-        ) return 
-
-          else if (last[0]===snakeHead[0] && last[1]===snakeHead[1]) {
+        if (last[0]===snakeHead[0] && last[1]===snakeHead[1]) {
             dir!==newDir && setDir(newDir)
           }
         }
@@ -175,7 +179,7 @@ export default function Game() {
 
       else if (greedyToggle) {
         setAStarToggle(false)
-
+        setSpeed(100)
         var newPath = null;
     
         const result = greedy(snake, apple[0], apple[1], SCALE, CANVAS_SIZE)
@@ -190,17 +194,11 @@ export default function Game() {
           const secondLast = [ newPath[length-2].i, newPath[length-2].j ]
           const newDir = [ secondLast[0]-last[0], secondLast[1]-last[1] ]
 
-          if (
-            Math.abs(dir[0]) === Math.abs(newDir[0])
-            || Math.abs(dir[1]) === Math.abs(newDir[1])
-        ) return 
-
-          else if (last[0]===snakeHead[0] && last[1]===snakeHead[1]) {
+          if (last[0]===snakeHead[0] && last[1]===snakeHead[1]) {
             dir!==newDir && setDir(newDir)
           }
         }
       }
-
     }, [snake, apple, gameOver])
 
     useEffect(()=>{
@@ -209,10 +207,10 @@ export default function Game() {
   
     return (
       <div className="game-components">
-      <div className="game">
+      <div {... handlers} className="game">
         <h1>Snake AI</h1>
         <canvas
-          style={{ border: "3px solid white" }}
+          style={{ border: "0.2rem solid white" }}
           ref={canvasRef}
           width={`${CANVAS_SIZE[0]}px`}
           height={`${CANVAS_SIZE[1]}px`}
@@ -225,23 +223,29 @@ export default function Game() {
           setAStarToggle(!aStarToggle)
           setGreedyToggle(false)
         }}>{(aStarToggle) ? "A* (on)" : "A*"}</button>
+
         <button onClick={()=> {
           setGreedyToggle(!greedyToggle)
           setAStarToggle(false)
         }}>{(greedyToggle) ? "Greedy (on)" : "Greedy"}</button>
+
         {(aStarToggle || greedyToggle) &&
         <div className="checkboxes">
+
           <div className="checkbox-item"><h4>Scanned</h4>
           <input type="checkbox" onChange={e => {
             if (e.target.checked) setClosedToggle(true)
             else setClosedToggle(false)
           }}/></div>
+
         <div className="checkbox-item"><h4>Path</h4> 
           <input type="checkbox" onChange={e => {
             if (e.target.checked) setPathToggle(true)
             else setPathToggle(false)
           }}/></div>
+
           </div>}
+
       </div>
     </div>
     )

@@ -99,7 +99,7 @@ const findPath = () => {
 }
 
 const getNeighbours = (current, appleX, appleY) => {
-    const i = current.i, j = current.j, g = current.g+1
+    const i = current.i, j = current.j
 
     const left = { 
         i: i-1, 

@@ -36,14 +36,14 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
         }
 
         getNeighbours(current, appleX, appleY).forEach((neighbour) => {
-
+            
             const { i, j } = neighbour
 
             if (checkCollision(i, j, snake, SCALE, CANVAS_SIZE) || closed.some(item => item.i===neighbour.i && item.j===neighbour.j)) 
                 return
 
             const newMovementCostToNeighbour = current.g + getHValue(current.i, current.j, neighbour.i, neighbour.j)   
-            
+
             if (newMovementCostToNeighbour < neighbour.g || !open.some(item => item.i===neighbour.i && item.j===neighbour.j)) {
                 neighbour.g = newMovementCostToNeighbour
                 neighbour.h = getHValue(i, j, appleX, appleY)
