@@ -39,6 +39,7 @@ export default function Game() {
     }, [])
 
     const handlers = useSwipeable(({
+        onSwipeStart: (e) => e.preventDefaultTouchmoveEvent,
         onSwipedLeft: () => moveSnake({keyCode: 37}),
         onSwipedUp: () => moveSnake({keyCode: 38}),
         onSwipedRight: () => moveSnake({keyCode: 39}),
