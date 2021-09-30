@@ -1,10 +1,10 @@
 import React, { useState, useRef, useEffect } from "react";
 import { useInterval } from "../utils/useInterval.js";
 import {
+  SCALE,
   CANVAS_SIZE,
   SNAKE_START,
   APPLE_START,
-  SCALE,
   SPEED,
   DIRECTIONS
 } from "../utils/constants";
@@ -30,9 +30,9 @@ export default function Game() {
     useInterval(() => gameLoop(), speed);
 
     useEffect(() => {
-        const context = canvasRef.current.getContext("2d");
-        context.setTransform(SCALE, 0, 0, SCALE, 0, 0);
-        document.addEventListener('keydown', moveSnake)
+      const context = canvasRef.current.getContext("2d");
+      context.setTransform(SCALE, 0, 0, SCALE, 0, 0);
+      document.addEventListener('keydown', moveSnake)
     }, [])
   
     const endGame = () => {
