@@ -204,7 +204,7 @@ export default function Game() {
     }, [snake, apple, gameOver])
 
     useEffect(()=>{
-      if (aStarToggle || aStarToggle) startGame()
+      if (aStarToggle || greedyToggle) startGame()
     },[aStarToggle, greedyToggle])
   
     return (
