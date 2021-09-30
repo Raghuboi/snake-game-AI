@@ -10,6 +10,7 @@ import {
 } from "../utils/constants";
 
 import { aStar } from "../utils/AStar.js";
+import { greedy } from "../utils/Greedy.js"
 
 export default function Game() {
     const canvasRef = useRef();
@@ -25,6 +26,7 @@ export default function Game() {
     const [closed, setClosed] = useState(null)
 
     const [aStarToggle, setAStarToggle] = useState(false)
+    const [greedyToggle, setGreedyToggle] = useState(false)
     const [survivalMode, setSurvivalMode] = useState(false)
   
     useInterval(() => gameLoop(), speed);
@@ -38,6 +40,10 @@ export default function Game() {
     const endGame = () => {
       setSpeed(null);
       setGameOver(true);
+      setAStarToggle(false)
+      setGreedyToggle(false)
+      setPathToggle(false)
+      setClosedToggle(false)
     };
   
     const moveSnake = ({ keyCode }) => {
@@ -125,6 +131,7 @@ export default function Game() {
         if (aStarToggle) {
           context.fillStyle = (survivalMode) ? "green" : "purple"
         }    
+        else if (greedyToggle) context.fillStyle = "yellow"
         else context.fillStyle = "#6CBB3C";
         snake.forEach(([x, y]) => context.fillRect(x, y, 1, 1));
         context.fillStyle = "#EB4C42";
@@ -139,6 +146,7 @@ export default function Game() {
       const snakeHead = snake[0]
 
       if (aStarToggle) {
+        setGreedyToggle(false)
         var newPath = null;
     
         const result = aStar(snake, apple[0], apple[1], SCALE, CANVAS_SIZE)
@@ -165,13 +173,39 @@ export default function Game() {
         }
       }
 
+      else if (greedyToggle) {
+        setAStarToggle(false)
+
+        var newPath = null;
+    
+        const result = greedy(snake, apple[0], apple[1], SCALE, CANVAS_SIZE)
+        newPath = result.path
+        setClosed(result.closed)
+
+        newPath && setPath(newPath)
+        const length = newPath.length
+
+        if(newPath && length>=2) {
+          const last = [ newPath[length-1].i, newPath[length-1].j ]
+          const secondLast = [ newPath[length-2].i, newPath[length-2].j ]
+          const newDir = [ secondLast[0]-last[0], secondLast[1]-last[1] ]
+
+          if (
+            Math.abs(dir[0]) === Math.abs(newDir[0])
+            || Math.abs(dir[1]) === Math.abs(newDir[1])
+        ) return 
+
+          else if (last[0]===snakeHead[0] && last[1]===snakeHead[1]) {
+            dir!==newDir && setDir(newDir)
+          }
+        }
+      }
+
     }, [snake, apple, gameOver])
 
     useEffect(()=>{
-      if (aStarToggle) {
-        startGame()
-      }
-    },[aStarToggle])
+      if (aStarToggle || aStarToggle) startGame()
+    },[aStarToggle, greedyToggle])
   
     return (
       <div className="game-components">
@@ -187,8 +221,15 @@ export default function Game() {
       <div className="buttons">
         {gameOver && <div>GAME OVER!</div>}
         <button onClick={startGame}>Start Game</button>
-        <button onClick={()=> {setAStarToggle(!aStarToggle)}}>A*</button>
-        {aStarToggle &&
+        <button onClick={()=> {
+          setAStarToggle(!aStarToggle)
+          setGreedyToggle(false)
+        }}>{(aStarToggle) ? "A* (on)" : "A*"}</button>
+        <button onClick={()=> {
+          setGreedyToggle(!greedyToggle)
+          setAStarToggle(false)
+        }}>{(greedyToggle) ? "Greedy (on)" : "Greedy"}</button>
+        {(aStarToggle || greedyToggle) &&
         <div className="checkboxes">
           <div className="checkbox-item"><h4>Scanned</h4>
           <input type="checkbox" onChange={e => {
