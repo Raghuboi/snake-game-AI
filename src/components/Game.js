@@ -28,7 +28,6 @@ export default function Game() {
 
     const [aStarToggle, setAStarToggle] = useState(false)
     const [greedyToggle, setGreedyToggle] = useState(false)
-    const [survivalMode, setSurvivalMode] = useState(false)
   
     useInterval(() => gameLoop(), speed);
 
@@ -115,8 +114,8 @@ export default function Game() {
     const drawLine = (path) => {
       const ctx = canvasRef.current.getContext("2d")
      
-      ctx.strokeStyle = "blue";
-      for(let i=1; i<path.length -3; i++){
+      ctx.strokeStyle = "purple";
+      for(let i=1; i<path.length - 2; i++){
           ctx.beginPath();
           ctx.moveTo(path[i].i+0.5, path[i].j+0.5);
           ctx.lineTo(path[i+1].i+0.5, path[i+1].j+0.5);
@@ -138,17 +137,15 @@ export default function Game() {
     useEffect(() => {
         const context = canvasRef.current.getContext("2d");
         context.clearRect(0, 0, window.innerWidth, window.innerHeight);
-        if (aStarToggle) {
-          context.fillStyle = (survivalMode) ? "green" : "purple"
-        }    
+
+        if (aStarToggle) context.fillStyle = "pink"
         else if (greedyToggle) context.fillStyle = "yellow"
         else context.fillStyle = "#6CBB3C";
+
         snake.forEach(([x, y]) => context.fillRect(x, y, 1, 1));
         context.fillStyle = "#EB4C42";
         context.fillRect(apple[0], apple[1], 1, 1);
 
-        !gameOver && pathToggle && path && drawLine(path)
-        !gameOver && closedToggle && closed && drawClosed(closed)
     }, [snake, apple, gameOver])
 
     useEffect(() => {
@@ -161,20 +158,16 @@ export default function Game() {
     
         const result = aStar(snake, apple[0], apple[1], SCALE, CANVAS_SIZE)
         newPath = result.path
-        setSurvivalMode(result.survivalMode)
         setClosed(result.closed)
 
         newPath && setPath(newPath)
         const length = newPath.length
 
         if(newPath && length>=2) {
-          const last = [ newPath[length-1].i, newPath[length-1].j ]
-          const secondLast = [ newPath[length-2].i, newPath[length-2].j ]
+          const last = [ newPath[length-1].i, newPath[length-1].j ], secondLast = [ newPath[length-2].i, newPath[length-2].j ]
           const newDir = [ secondLast[0]-last[0], secondLast[1]-last[1] ]
 
-        if (last[0]===snakeHead[0] && last[1]===snakeHead[1]) {
-            dir!==newDir && setDir(newDir)
-          }
+          if (last[0]===snakeHead[0] && last[1]===snakeHead[1]) dir!==newDir && setDir(newDir)
         }
       }
 
@@ -199,6 +192,11 @@ export default function Game() {
             dir!==newDir && setDir(newDir)
           }
         }
+      }
+
+      if (aStarToggle || greedyToggle) {
+        !gameOver && pathToggle && path && drawLine(path)
+        !gameOver && closedToggle && closed && drawClosed(closed)
       }
     }, [snake, apple, gameOver])
 

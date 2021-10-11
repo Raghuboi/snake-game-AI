@@ -1,13 +1,14 @@
-let open = [], closed = [], path = [], survivalMode= false
+let open = [], closed = [], path = []
 
 export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {   
-    survivalMode= false
     open.splice(0)
     closed.splice(0)
-    let counter = 0
-
+    
     const snakeHeadX = snake[0][0]
     const snakeHeadY = snake[0][1]
+
+    // f(x) = g(x) + h(x), where h(x) is the distance to the target node (apple) & g(x) is the distance to the starting node
+    // g(x) of the Snake's head is 0 because it is the starting node.
 
     open[0] = {
         i: snakeHeadX,
@@ -15,16 +16,9 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
         g: 0,
         f: getHValue({ i: snakeHeadX, j: snakeHeadY }, appleX, appleY),
         cameFrom: null
-        //cameFrom: { i: snake[1][0], j: snake[1][1] }
     }
 
-    while (open.length>0) {
-        counter++
-        if (counter>3000) {
-            console.log("error")
-            survivalMode = true
-            break
-        } 
+    while (open.length>0) { 
 
         const current = open[0]
         open.splice(0,1)
@@ -36,21 +30,21 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
         }
 
         getNeighbours(current, appleX, appleY).forEach((neighbour) => {
-            
+        
             const { i, j } = neighbour
 
-            if (checkCollision(i, j, snake, SCALE, CANVAS_SIZE) || closed.some(item => item.i===neighbour.i && item.j===neighbour.j)) 
+            if (checkCollision(i, j, snake, SCALE, CANVAS_SIZE) || closed.some(item => item.i===i && item.j===j)) 
                 return
 
-            const newMovementCostToNeighbour = current.g + getHValue(current.i, current.j, neighbour.i, neighbour.j)   
+            const newMovementCostToNeighbour = current.g + getHValue(current.i, current.j, i, j)   
 
-            if (newMovementCostToNeighbour < neighbour.g || !open.some(item => item.i===neighbour.i && item.j===neighbour.j)) {
+            if (newMovementCostToNeighbour < neighbour.g || !open.some(item => item.i===i && item.j===j)) {
                 neighbour.g = newMovementCostToNeighbour
                 neighbour.h = getHValue(i, j, appleX, appleY)
                 neighbour.f = neighbour.g + neighbour.h
                 neighbour.cameFrom = current
 
-                if(!open.some(item => item.i===neighbour.i && item.j===neighbour.j)) open.push(neighbour)
+                if(!open.some(item => item.i===i && item.j===j)) open.push(neighbour)
             }
 
             for(let r = open.length -1 ; r >0 ; r--){
@@ -66,11 +60,12 @@ export const aStar = (snake, appleX, appleY, SCALE, CANVAS_SIZE) => {
 
     path.splice(0)
     findPath()
-    return { path, survivalMode, closed }
+    return { path, closed }
 }
 
 const checkCollision = (i, j, snake, SCALE, CANVAS_SIZE) => {
 
+    // checking if node is out of bounds
     if (
       i * SCALE >= CANVAS_SIZE[0] ||
       i < 0 ||
@@ -78,7 +73,8 @@ const checkCollision = (i, j, snake, SCALE, CANVAS_SIZE) => {
       j < 0
     )
       return true;
-
+    
+    // checking for collission with Snake's body
     for (const segment of snake) {
       if (i === segment[0] && j === segment[1]) {
           return true
