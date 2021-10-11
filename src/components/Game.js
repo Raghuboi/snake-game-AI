@@ -235,7 +235,7 @@ export default function Game() {
       <div {... handlers} className="game">
         <div id="title"><h1 style={{color: "#6CBB3C"}}>Snake</h1><h1 style={{color: "#EB4C42"}}>AI</h1></div>
         <canvas
-          style={{ border: "0.2rem solid white" }}
+          style={{ outline: "0.2rem solid white" }}
           ref={canvasRef}
           width={`${CANVAS_SIZE[0]}px`}
           height={`${CANVAS_SIZE[1]}px`}
