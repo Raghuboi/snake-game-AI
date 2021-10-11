@@ -129,7 +129,7 @@ export default function Game() {
       const context = canvasRef.current.getContext("2d")
       context.globalAlpha = 0.2
       context.fillStyle = "white"
-      closed && closed.forEach(({i, j}) => context.fillRect(i, j, 1, 1))
+      closed && closed.forEach(({i, j}) => context.fillRect(i, j, 0.95, 0.95))
       context.globalAlpha =1
 
     }
@@ -144,7 +144,7 @@ export default function Game() {
 
         snake.forEach(([x, y]) => context.fillRect(x, y, 1, 1));
         context.fillStyle = "#EB4C42";
-        context.fillRect(apple[0], apple[1], 1, 1);
+        context.fillRect(apple[0], apple[1], 0.95, 0.95);
 
     }, [snake, apple, gameOver])
 
