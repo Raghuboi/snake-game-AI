@@ -20,6 +20,7 @@ export default function Game() {
     const [dir, setDir] = useState([0, -1])
     const [speed, setSpeed] = useState(null)
     const [gameOver, setGameOver] = useState(false)
+    const [score, setScore] = useState(0)
 
     const [path, setPath] = useState(null)
     const [pathToggle, setPathToggle] = useState(false)
@@ -28,6 +29,7 @@ export default function Game() {
 
     const [aStarToggle, setAStarToggle] = useState(false)
     const [greedyToggle, setGreedyToggle] = useState(false)
+    const [gradientToggle, setGradientToggle] = useState(false)
   
     useInterval(() => gameLoop(), speed);
 
@@ -45,6 +47,8 @@ export default function Game() {
         onSwipedDown: () => moveSnake({keyCode: 40})
     }))
   
+    /* helper methods for gameplay */
+
     const endGame = () => {
       setSpeed(null);
       setGameOver(true);
@@ -67,14 +71,16 @@ export default function Game() {
   
     const checkCollision = (piece, snk = snake) => {
 
+      // checking if node is out of bounds     
       if (
         piece[0] * SCALE >= CANVAS_SIZE[0] ||
         piece[0] < 0 ||
         piece[1] * SCALE >= CANVAS_SIZE[1] ||
         piece[1] < 0
       )
-        return true;
-  
+        return true
+
+      // checking if node collides with Snake's body
       for (const segment of snk) {
         if (piece[0] === segment[0] && piece[1] === segment[1]) return true;
       }
@@ -98,7 +104,9 @@ export default function Game() {
       const newSnakeHead = [snakeCopy[0][0] + dir[0], snakeCopy[0][1] + dir[1]];
       snakeCopy.unshift(newSnakeHead);
       if (checkCollision(newSnakeHead)) endGame();
-      if (!checkAppleCollision(snakeCopy)) snakeCopy.pop();
+      if (checkAppleCollision(snakeCopy)) {
+        setScore(score+1)
+      } else snakeCopy.pop();
       setSnake(snakeCopy);
     }
       
@@ -109,12 +117,15 @@ export default function Game() {
         setDir([0, -1]);
         setSpeed(SPEED);
         setGameOver(false);
+        setScore(0)
     }
+
+    /* helper methods for drawing on canvas */
 
     const drawLine = (path) => {
       const ctx = canvasRef.current.getContext("2d")
      
-      ctx.strokeStyle = "purple";
+      ctx.strokeStyle = "white";
       for(let i=1; i<path.length - 2; i++){
           ctx.beginPath();
           ctx.moveTo(path[i].i+0.5, path[i].j+0.5);
@@ -133,21 +144,37 @@ export default function Game() {
       context.globalAlpha =1
 
     }
+
+    const createGradient = (colors, x1, y1) => {
+      const context = canvasRef.current.getContext("2d")
+      const grd = context.createLinearGradient(x1, y1, x1+1, y1+1)
+      grd.addColorStop(0, colors[0])
+      grd.addColorStop(1, colors[1])
+      return grd
+    }
   
+    /* useEffect hook to draw on canvas */ 
     useEffect(() => {
-        const context = canvasRef.current.getContext("2d");
-        context.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        const context = canvasRef.current.getContext("2d")
+        context.clearRect(0, 0, window.innerWidth, window.innerHeight)
 
-        if (aStarToggle) context.fillStyle = "pink"
-        else if (greedyToggle) context.fillStyle = "yellow"
-        else context.fillStyle = "#6CBB3C";
+        // coloring Snake's body
+        var snakeFill = (gradientToggle) ? ["#6CBB3C", "green"] : "#6CBB3C"
+        if (aStarToggle) snakeFill = (gradientToggle) ? ["pink", "#FF3659"] : "pink"
+        else if (greedyToggle) snakeFill = (gradientToggle) ? ["yellow", "#A3A300"] : "yellow"
 
-        snake.forEach(([x, y]) => context.fillRect(x, y, 1, 1));
-        context.fillStyle = "#EB4C42";
-        context.fillRect(apple[0], apple[1], 0.95, 0.95);
+        snake.forEach(([x, y]) => {
+          context.fillStyle = (gradientToggle) ? createGradient(snakeFill, x, y) : snakeFill
+          context.fillRect(x, y, 1, 1)
+        })
 
-    }, [snake, apple, gameOver])
+        // coloring Apple
+        context.fillStyle = (gradientToggle) ? createGradient(["#EB4C42", "#A30000"], apple[0], apple[1]) : "#EB4C42"
+        context.fillRect(apple[0], apple[1], 1, 1)
 
+    }, [snake, apple, gameOver, gradientToggle])
+
+    /* useEffect hook to handle AI */
     useEffect(() => {
       const snakeHead = snake[0]
 
@@ -184,8 +211,7 @@ export default function Game() {
         const length = newPath.length
 
         if(newPath && length>=2) {
-          const last = [ newPath[length-1].i, newPath[length-1].j ]
-          const secondLast = [ newPath[length-2].i, newPath[length-2].j ]
+          const last = [ newPath[length-1].i, newPath[length-1].j ], secondLast = [ newPath[length-2].i, newPath[length-2].j ]
           const newDir = [ secondLast[0]-last[0], secondLast[1]-last[1] ]
 
           if (last[0]===snakeHead[0] && last[1]===snakeHead[1]) {
@@ -200,6 +226,7 @@ export default function Game() {
       }
     }, [snake, apple, gameOver])
 
+    // AI toggle restarts game
     useEffect(()=>{
       if (aStarToggle || greedyToggle) startGame()
     },[aStarToggle, greedyToggle])
@@ -216,6 +243,7 @@ export default function Game() {
         />
       </div>
       <div className="buttons">
+        {score>0 && <p>Score: {score}</p>}
         {gameOver && <div>GAME OVER!</div>}
         <button onClick={startGame}>Start Game</button>
         <button onClick={()=> {
@@ -228,22 +256,27 @@ export default function Game() {
           setAStarToggle(false)
         }}>{(greedyToggle) ? "Greedy (on)" : "Greedy"}</button>
 
-        {(aStarToggle || greedyToggle) &&
         <div className="checkboxes">
+          <div className="checkbox-item"><h4>3d</h4>
+            <input type="checkbox" onChange={e => {
+              if (e.target.checked) setGradientToggle(!gradientToggle)
+              else setGradientToggle(false)
+            }}/></div>
 
-          <div className="checkbox-item"><h4>Scanned</h4>
-          <input type="checkbox" onChange={e => {
-            if (e.target.checked) setClosedToggle(true)
-            else setClosedToggle(false)
-          }}/></div>
+          {(aStarToggle || greedyToggle) &&
+            <><div className="checkbox-item"><h4>Scanned</h4>
+              <input type="checkbox" onChange={e => {
+                if (e.target.checked) setClosedToggle(true)
+                else setClosedToggle(false)
+              }}/></div> 
 
-        <div className="checkbox-item"><h4>Path</h4> 
-          <input type="checkbox" onChange={e => {
-            if (e.target.checked) setPathToggle(true)
-            else setPathToggle(false)
-          }}/></div>
+            <div className="checkbox-item"><h4>Path</h4> 
+              <input type="checkbox" onChange={e => {
+                if (e.target.checked) setPathToggle(true)
+                else setPathToggle(false)
+              }}/></div></>}
 
-          </div>}
+          </div>
 
       </div>
     </div>
