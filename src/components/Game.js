@@ -234,7 +234,7 @@ export default function Game() {
     return (
       <div className="game-components">
       <div {... handlers} className="game">
-        <h1>Snake AI</h1>
+        <div id="title"><h1 style={{color: "#6CBB3C"}}>Snake</h1><h1 style={{color: "#EB4C42"}}>AI</h1></div>
         <canvas
           style={{ border: "0.2rem solid white" }}
           ref={canvasRef}
@@ -242,19 +242,22 @@ export default function Game() {
           height={`${CANVAS_SIZE[1]}px`}
         />
       </div>
-      <div className="buttons">
-        {score>0 && <p>Score: {score}</p>}
-        {gameOver && <div>GAME OVER!</div>}
-        <button onClick={startGame}>Start Game</button>
-        <button onClick={()=> {
-          setAStarToggle(!aStarToggle)
-          setGreedyToggle(false)
-        }}>{(aStarToggle) ? "A* (on)" : "A*"}</button>
 
-        <button onClick={()=> {
-          setGreedyToggle(!greedyToggle)
-          setAStarToggle(false)
-        }}>{(greedyToggle) ? "Greedy (on)" : "Greedy"}</button>
+      <div className="toggles">
+        <div className="buttons">
+          {score>0 && <div id="score"><p>Score:</p><p style={{color: "gold"}}>{score}</p></div>}
+          {gameOver && <div style={{color: "#EB4C42"}}>GAME OVER!</div>}
+          <button onClick={startGame}>Start Game</button>
+          <button onClick={()=> {
+            setAStarToggle(!aStarToggle)
+            setGreedyToggle(false)
+          }}>{(aStarToggle) ? "A* (on)" : "A*"}</button>
+
+          <button onClick={()=> {
+            setGreedyToggle(!greedyToggle)
+            setAStarToggle(false)
+          }}>{(greedyToggle) ? "Greedy (on)" : "Greedy"}</button>
+        </div>
 
         <div className="checkboxes">
           <div className="checkbox-item"><h4>3d</h4>
@@ -275,9 +278,8 @@ export default function Game() {
                 if (e.target.checked) setPathToggle(true)
                 else setPathToggle(false)
               }}/></div></>}
-
           </div>
-
+  
       </div>
     </div>
     )

@@ -1,5 +1,5 @@
 const SCALE = (window.innerWidth<800) ? 20 : 40;
-const CANVAS_SIZE = (window.innerWidth<800) ? [window.innerWidth*0.6,window.innerWidth*0.6+SCALE] : [600, 600+SCALE];
+const CANVAS_SIZE = (window.innerWidth<800) ? [window.innerWidth*0.8, window.innerWidth*0.8+SCALE] : [600, 600+SCALE];
 const SNAKE_START = [
   [8, 7],
   [8, 8]
