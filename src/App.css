@@ -121,6 +121,10 @@ body {
         padding: 0 1rem;
     }
 
+    #info:hover {
+        transform: none;
+    }
+
     #score {
         position: absolute;
         right: 1rem;
