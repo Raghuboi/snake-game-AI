@@ -240,7 +240,7 @@ export default function Game() {
   
     return (
       <div className="game-components">
-      {(aStarToggle || greedyToggle) && <button id="info" onClick={infoClickHandler}>Learn More</button>}
+      {(aStarToggle || greedyToggle) && <button id="info" onClick={infoClickHandler}>Info (!)</button>}
       <div {... handlers} className="game">
         <div id="title"><h1 style={{color: "#6CBB3C"}}>Snake</h1><h1 style={{color: "#EB4C42"}}>AI</h1></div>
         <canvas
