@@ -5,4 +5,4 @@ export const aStarWriteUp = "A* algorithm is a best-first searching algorithm th
 
 export const greedyWriteUp = "Greedy is an algorithmic paradigm that builds up a solution piece by piece, always choosing the next piece"
 +" that offers the most obvious and immediate benefit.\n\nUnlike A*, which is also a best-first searching algorithm, it does not take into account"
-+" the cost of moving from the initial node to the final node-- hence, it is said to offer the 'shortest path', and not the 'shortest *OPTIMAL* path'."
++" the cost of moving from the initial node to the final node-- hence, it is said to offer the 'shortest path', and NOT the 'shortest *OPTIMAL* path'."

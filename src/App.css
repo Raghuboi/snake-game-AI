@@ -85,6 +85,17 @@ body {
     transform: scale(1.2);
 }
 
+#info {
+    position: absolute;
+    top: 1.75rem;
+    left: 1.75rem;
+    padding: 0.5rem 1rem;
+}
+
+#info:hover {
+    transform: scale(1.2);
+}
+
 @media only screen and (max-width: 800px) {
 
     :root {
