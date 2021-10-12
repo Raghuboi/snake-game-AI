@@ -12,9 +12,11 @@ import {
 
 import { aStar } from "../utils/AStar.js";
 import { greedy } from "../utils/Greedy.js"
+import { aStarWriteUp, greedyWriteUp } from "../utils/algo-write-ups.js";
 
 export default function Game() {
-    const canvasRef = useRef();
+    const canvasRef = useRef()
+
     const [snake, setSnake] = useState(SNAKE_START)
     const [apple, setApple] = useState(APPLE_START)
     const [dir, setDir] = useState([0, -1])
@@ -29,7 +31,7 @@ export default function Game() {
 
     const [aStarToggle, setAStarToggle] = useState(false)
     const [greedyToggle, setGreedyToggle] = useState(false)
-    const [gradientToggle, setGradientToggle] = useState(false)
+    const [gradientToggle, setGradientToggle] = useState(true)
   
     useInterval(() => gameLoop(), speed);
 
@@ -229,9 +231,16 @@ export default function Game() {
     useEffect(()=>{
       if (aStarToggle || greedyToggle) startGame()
     },[aStarToggle, greedyToggle])
+
+    // click handler for information pop-up
+    const infoClickHandler = () => {
+      if (aStarToggle) alert(aStarWriteUp)
+      else if (greedyToggle) alert(greedyWriteUp)
+    }
   
     return (
       <div className="game-components">
+      {(aStarToggle || greedyToggle) && <button id="info" onClick={infoClickHandler}>Learn More</button>}
       <div {... handlers} className="game">
         <div id="title"><h1 style={{color: "#6CBB3C"}}>Snake</h1><h1 style={{color: "#EB4C42"}}>AI</h1></div>
         <canvas
@@ -260,7 +269,7 @@ export default function Game() {
 
         <div className="checkboxes">
           <div className="checkbox-item"><h4>3d</h4>
-            <input type="checkbox" onChange={e => {
+            <input type="checkbox" defaultChecked={true} onChange={e => {
               if (e.target.checked) setGradientToggle(!gradientToggle)
               else setGradientToggle(false)
             }}/></div>

@@ -87,10 +87,36 @@ body {
 
 @media only screen and (max-width: 800px) {
 
+    :root {
+        --info-score-top-height: 4rem;
+        --info-button-height: 2rem; 
+    }
+
+    #info, #score {
+        top: var(--info-score-top-height); /* 4 rem */
+        transform: translateY(calc( var(--info-score-top-height) / -2) ); /* 4 rem / -2 = -2 rem */
+    }
+
+    #info {
+        position: absolute;
+        left: 1rem;
+        height: var(--info-button-height); /* = 2 rem; height of 2 rem means 1 rem on the upper half and 1 rem on the lower half */
+
+        /* We subtract 1/4th the height of this button (1/2 of the upper half height) from the info-score-top-height 
+            to make both of them (score & info) symmetrical from the top */
+
+        top: calc( var(--info-score-top-height) - calc(var(--info-button-height) / 4)); /* 4 rem - (1/4 * 2 rem) = 3.5 rem; */ 
+        width: fit-content;
+        padding: 0 1rem;
+    }
+
     #score {
         position: absolute;
-        top: 1rem;
         right: 1rem;
+    }
+
+    #score p {
+        margin: 0;
     }
 
     .toggles {
